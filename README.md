@@ -35,7 +35,7 @@ az policy definition create \
 az policy assignment create \
   --name "require-tags-assignment" \
   --policy "deny-resources-without-tags" \
-  --resource-group <YOUR_RESOURCE_GROUP_NAME>
+  --resource-group "Azuredevops"
 
 3. Build the Server Image with Packer
 Bake the application and its dependencies into a custom Managed Image.
