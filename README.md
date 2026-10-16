@@ -4,9 +4,10 @@
 For this project, you will write a Packer template and a Terraform template to deploy a customizable, scalable web server in Azure.
 
 ### Getting Started
-1. Clone this repository
-2. Create your infrastructure as code
-3. Update this README to reflect how someone would use your code.
+To use the code in this repository, you will follow a three-phase workflow:
+1. **Prepare the environment:** Clone this repository locally and configure your Azure credentials as environment variables.
+2. **Bake the Image:** Use Packer to create a custom Ubuntu machine image that contains our web application dependencies.
+3. **Deploy the Infrastructure:** Use Terraform to read your customizable `vars.tf` variables and deploy a Virtual Machine Scale Set (VMSS), Networking, and Load Balancer architecture using the image created by Packer.
 
 ### Dependencies
 1. Create an [Azure Account](https://portal.azure.com) 
@@ -15,14 +16,18 @@ For this project, you will write a Packer template and a Terraform template to d
 4. Install [Terraform](https://www.terraform.io/downloads.html)
 
 ### Instructions
+
 **1. Authenticate with Azure**
-Before running any tools, you must authenticate your terminal with your Azure account. You can do this by running:
+Export your provided lab credentials as environment variables so Packer and Terraform can authenticate:
 ```bash
-az login
+export ARM_CLIENT_ID="your-client-id"
+export ARM_CLIENT_SECRET="your-client-secret"
+export ARM_SUBSCRIPTION_ID="your-subscription-id"
+export ARM_TENANT_ID="your-tenant-id"
 
 Note: If using a lab environment, export your provided credentials as environment variables (ARM_CLIENT_ID, ARM_CLIENT_SECRET, ARM_SUBSCRIPTION_ID, ARM_TENANT_ID).
 
-2. Enforce Tagging Policy
+**2. Enforce Tagging Policy**
 To comply with security and organizational standards, deploy the Azure Policy that denies the creation of resources without tags.
 
 # Create the policy definition
@@ -37,8 +42,8 @@ az policy assignment create \
   --policy "deny-resources-without-tags" \
   --resource-group "Azuredevops"
 
-3. Build the Server Image with Packer
-Bake the application and its dependencies into a custom Managed Image.
+**3. Build the Server Image with Packer**
+Navigate to the directory containing your Packer template to bake the application image.
 
 # Validate the template
 packer validate server.json
@@ -48,8 +53,18 @@ packer build server.json
 
 Important: When the build completes, copy the Managed Image ID from the terminal output. You will need it for Terraform.
 
-4. Provision Infrastructure with Terraform
-Deploy the Virtual Machine Scale Set (VMSS), Load Balancer, and Networking resources.
+**4. Customize the Deployment (vars.tf)**
+Before running Terraform, you can customize the deployment by modifying the vars.tf (or variables.tf) file.
+
+Instance Count: Change the number of VMs in your scale set by updating the default value of the vm_count variable.
+
+Location: Update the location variable to deploy the infrastructure to a different Azure region.
+
+Resource Naming: Modify prefix variables to change how your Load Balancer, VNet, and VMSS are named in Azure.
+
+
+**5. Provision Infrastructure with Terraform**
+Deploy the infrastructure using your customized variables and the image created in Step 3.
 
 # Initialize the Terraform working directory
 terraform init
@@ -64,16 +79,15 @@ Note: Because of the policy applied in Step 2, ensure all Terraform resources in
 
 ### Output
 
-Once the Terraform deployment is complete, the following infrastructure will be provisioned in your Azure Resource Group:
+Upon successful deployment, Terraform will output the results to your terminal. The expected output includes:
 
-Custom Managed Image: A golden Ubuntu image containing the pre-configured web application.
+Terminal Confirmation: A message stating Apply complete! Resources: X added, 0 changed, 0 destroyed.
 
-Networking: A Virtual Network (VNet) and Subnet.
+Provisioned Resources in Azure:
 
-Security: A Network Security Group (NSG) restricting incoming traffic to necessary ports (e.g., HTTP).
+   - A Virtual Network and Subnet.
+   - A Network Security Group allowing external HTTP access.
+   - A Public Load Balancer distributing traffic.
+   - A Virtual Machine Scale Set spanning multiple VMs running your custom Packer image.
 
-Load Balancing: A Public Load Balancer with a Public IP address to distribute incoming traffic.
-
-Compute: A scalable Virtual Machine Scale Set (VMSS) running the custom Packer image behind the load balancer.
-
-You will be able to retrieve the Load Balancer's Public IP from the Azure Portal (or via Terraform outputs) and navigate to it in your web browser to see the running web application.
+Application Verification: Terraform should output the Public IP address of your Load Balancer. If you copy that IP address and paste it into your web browser, you will see the "Hello, World!" web page served by the application you provisioned.
