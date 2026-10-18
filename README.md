@@ -22,8 +22,8 @@ Export your provided lab credentials as environment variables so Packer and Terr
 ```bash
 export ARM_CLIENT_ID="your-client-id"
 export ARM_CLIENT_SECRET="your-client-secret"
-export ARM_SUBSCRIPTION_ID="your-subscription-id"
-export ARM_TENANT_ID="your-tenant-id"
+export ARM_SUBSCRIPTION_ID="0c7436df-9359-4a04-b572-96ab6d89334c"
+export ARM_TENANT_ID="f958e84a-92b8-439f-a62d-4f45996b6d07"
 
 Note: If using a lab environment, export your provided credentials as environment variables (ARM_CLIENT_ID, ARM_CLIENT_SECRET, ARM_SUBSCRIPTION_ID, ARM_TENANT_ID).
 
